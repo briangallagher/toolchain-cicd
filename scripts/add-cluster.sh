@@ -28,8 +28,8 @@ login_to_cluster() {
       else
         # REGISTER_SERVER_API=$(yq -r .\"$1\".serverAPI ${SANDBOX_CONFIG})
         # REGISTER_SA_TOKEN=$(yq -r .\"$1\".tokens.registerCluster ${SANDBOX_CONFIG})
-        REGISTER_SERVER_API=$(/Users/briangallagher/go/bin/yq r .\"$1\".serverAPI ${SANDBOX_CONFIG})
-        REGISTER_SA_TOKEN=$(/Users/briangallagher/go/bin/yq r .\"$1\".tokens.registerCluster ${SANDBOX_CONFIG})        
+        REGISTER_SERVER_API=$(yq e .\"$1\".serverAPI ${SANDBOX_CONFIG})
+        REGISTER_SA_TOKEN=$(yq e .\"$1\".tokens.registerCluster ${SANDBOX_CONFIG})        
         OC_ADDITIONAL_PARAMS="--token=${REGISTER_SA_TOKEN} --server=${REGISTER_SERVER_API}"
       fi
     fi
@@ -216,8 +216,8 @@ done
 CLUSTER_JOIN_TO="host"
 
 if [[ -n ${SANDBOX_CONFIG} ]]; then
-    OPERATOR_NS=$(/Users/briangallagher/go/bin/yq r .\"${JOINING_CLUSTER_TYPE}\".sandboxNamespace ${SANDBOX_CONFIG})
-    CLUSTER_JOIN_TO_OPERATOR_NS=$(/Users/briangallagher/go/bin/yq r .\"${TARGET_CLUSTER_NAME}\".sandboxNamespace ${SANDBOX_CONFIG})
+    OPERATOR_NS=$(yq e .\"${JOINING_CLUSTER_TYPE}\".sandboxNamespace ${SANDBOX_CONFIG})
+    CLUSTER_JOIN_TO_OPERATOR_NS=$(yq e .\"${TARGET_CLUSTER_NAME}\".sandboxNamespace ${SANDBOX_CONFIG})
     CLUSTER_JOIN_TO=${TARGET_CLUSTER_NAME}
 else
     # We need this to configurable to work with dynamic namespaces from end to end tests
@@ -263,12 +263,12 @@ else
 fi
 
 if [[ -n ${SANDBOX_CONFIG} ]]; then
-    API_ENDPOINT=$(/Users/briangallagher/go/bin/yq r .\"${JOINING_CLUSTER_TYPE}\".serverAPI ${SANDBOX_CONFIG})
-    JOINING_CLUSTER_NAME=$(/Users/briangallagher/go/bin/yq r .\"${JOINING_CLUSTER_TYPE}\".serverName ${SANDBOX_CONFIG})
+    API_ENDPOINT=$(yq e .\"${JOINING_CLUSTER_TYPE}\".serverAPI ${SANDBOX_CONFIG})
+    JOINING_CLUSTER_NAME=$(yq e .\"${JOINING_CLUSTER_TYPE}\".serverName ${SANDBOX_CONFIG})
 
     login_to_cluster ${CLUSTER_JOIN_TO}
 
-    CLUSTER_JOIN_TO_NAME=$(/Users/briangallagher/go/bin/yq r .\"${CLUSTER_JOIN_TO}\".serverName ${SANDBOX_CONFIG})
+    CLUSTER_JOIN_TO_NAME=$(yq e .\"${CLUSTER_JOIN_TO}\".serverName ${SANDBOX_CONFIG})
 else
     API_ENDPOINT=`oc get infrastructure cluster -o jsonpath='{.status.apiServerURL}' ${OC_ADDITIONAL_PARAMS}`
     # The regexp below extracts the domain name from the API server URL, taking everything after "//" until a ":" or "/" (or end of line) is reached.
